@@ -46,49 +46,43 @@ namespace sgl {
 
 	void Device::Display(const std::shared_ptr<Texture>& texture)
 	{
-#pragma message ("You have to complete this code!")
 		Error& error = Error::GetInstance();
+
 		//Create Programm
 		auto program = CreateProgram("Display");
 
 		//Need QadMesh
 		auto quad = CreateQuadMesh(program);
 
-		//Create TexttureManager
-		TextureManager texture_Manager = TextureManager();
-
 		//Add Texture calling DISPLAY
-		texture_Manager.AddTexture("Display", texture);
+		texture_manager_.AddTexture("Display", texture);
 
 		//Set Texture to Quad
 		quad->SetTextures({ "Display" });
 		
 		//Clear color and detph buffer
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glClear(GL_COLOR);
-		error.Display(__FILE__, __LINE__ - 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
 
 		//Draw Quad
-		quad->Draw(texture_Manager);
+		quad->Draw(texture_manager_, perspective_, view_, model_);
 
 	}
 
 	std::shared_ptr<Texture> Device::DrawTexture(const double dt)
 	{
-#pragma message ("You have to complete this code!")
+		//// Setup the camera.
+		//SetupCamera();
 
-		//take previous draw
-		SetupCamera();
+		//// Set the view port for rendering.
+		//glViewport(0, 0, size_.first, size_.second);
 
-		// Set the view port for rendering.
-		glViewport(0, 0, size_.first, size_.second);
-
-		// Clear the screen.
-		glClearColor(.2f, 0.f, .2f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//// Clear the screen.
+		//glClearColor(.2f, 0.f, .2f, 1.0f);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//need texture
-		std::shared_ptr<Texture> tmp_texture;
+		auto tmp_texture = std::make_shared<Texture>(size_);
 
 		Frame frame = Frame();
 		Render render = Render();

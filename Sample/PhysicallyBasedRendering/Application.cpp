@@ -172,7 +172,39 @@ std::shared_ptr<sgl::Texture> Application::CreateBrightness(
 	const std::shared_ptr<sgl::Texture>& texture) const
 {
 #pragma message ("You have to complete this code!")
-	return texture;
+
+	//size from texure
+	auto size = texture->GetSize();
+
+	//initialize frame-Render
+	sgl::Frame frame = sgl::Frame();
+	sgl::Render render = sgl::Render();
+
+	//Create new Texture
+	auto tmp_texture = std::make_shared<sgl::Texture>(size);
+
+	//Bind
+	tmp_texture->Bind();
+
+	//A texture manager.
+	sgl::TextureManager texture_Manager = sgl::TextureManager();
+
+	//Add the texture
+	texture_Manager.AddTexture("Display", texture);
+
+	//Create the program
+	auto program = sgl::CreateProgram("Brightness");
+
+	//Create the quad.
+	auto quad = CreateQuadMesh(program);
+
+	//Add the texture to the quad.
+	quad->SetTextures({ "Display" });
+	
+	//Draw
+	quad->Draw(texture_Manager);
+	
+	return tmp_texture;
 }
 
 std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
