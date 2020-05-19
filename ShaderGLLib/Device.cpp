@@ -47,12 +47,76 @@ namespace sgl {
 	void Device::Display(const std::shared_ptr<Texture>& texture)
 	{
 #pragma message ("You have to complete this code!")
+		Error& error = Error::GetInstance();
+		//Create Programm
+		auto program = CreateProgram("Display");
+
+		//Need QadMesh
+		auto quad = CreateQuadMesh(program);
+
+		//Create TexttureManager
+		TextureManager texture_Manager = TextureManager();
+
+		//Add Texture calling DISPLAY
+		texture_Manager.AddTexture("Display", texture);
+
+		//Set Texture to Quad
+		quad->SetTextures({ "Display" });
+		
+		//Clear color and detph buffer
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR);
+		error.Display(__FILE__, __LINE__ - 1);
+
+		//Draw Quad
+		quad->Draw(texture_Manager);
+
 	}
 
 	std::shared_ptr<Texture> Device::DrawTexture(const double dt)
 	{
 #pragma message ("You have to complete this code!")
-		return nullptr;
+
+		//take previous draw
+		SetupCamera();
+
+		// Set the view port for rendering.
+		glViewport(0, 0, size_.first, size_.second);
+
+		// Clear the screen.
+		glClearColor(.2f, 0.f, .2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//need texture
+		std::shared_ptr<Texture> tmp_texture;
+
+		Frame frame = Frame();
+		Render render = Render();
+
+		//Add Fram - Render
+		frame.BindAttach(render);
+		render.BindStorage(size_);
+
+		//bind texture
+		tmp_texture->Bind();
+
+		for (const std::shared_ptr<sgl::Scene>& scene : scene_tree_)
+		{
+			const std::shared_ptr<sgl::Mesh>& mesh = scene->GetLocalMesh();
+			if (!mesh)
+			{
+				continue;
+			}
+
+			// Draw the mesh.
+			mesh->Draw(
+				texture_manager_,
+				perspective_,
+				view_,
+				scene->GetLocalModel(dt));
+		}
+
+		return tmp_texture;
 	}
 
 	void Device::SetupCamera()
