@@ -74,12 +74,7 @@ namespace sgl {
 		//// Setup the camera.
 		//SetupCamera();
 
-		//// Set the view port for rendering.
-		//glViewport(0, 0, size_.first, size_.second);
 
-		//// Clear the screen.
-		//glClearColor(.2f, 0.f, .2f, 1.0f);
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//need texture
 		auto tmp_texture = std::make_shared<Texture>(size_);
@@ -92,7 +87,14 @@ namespace sgl {
 		render.BindStorage(size_);
 
 		//bind texture
-		tmp_texture->Bind();
+		frame.BindTexture(*tmp_texture);
+
+		//// Set the view port for rendering.
+		glViewport(0, 0, size_.first, size_.second);
+
+		//// Clear the screen.
+		//glClearColor(.2f, 0.f, .2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		for (const std::shared_ptr<sgl::Scene>& scene : scene_tree_)
 		{

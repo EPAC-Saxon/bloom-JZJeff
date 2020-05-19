@@ -162,10 +162,12 @@ std::vector<std::string> Application::CreateTextures(
 std::shared_ptr<sgl::Texture> Application::AddBloom(
 	const std::shared_ptr<sgl::Texture>& texture) const
 {
-	auto brightness = CreateBrightness(texture);
-	auto gaussian_blur = CreateGaussianBlur(brightness);
-	auto merge = MergeDisplayAndGaussianBlur(texture, gaussian_blur);
-	return merge;
+	return texture;
+	//auto brightness = CreateBrightness(texture);
+	//auto gaussian_blur = CreateGaussianBlur(brightness);
+	//auto merge = MergeDisplayAndGaussianBlur(texture, gaussian_blur);
+	//return merge;
+	
 }
 
 std::shared_ptr<sgl::Texture> Application::CreateBrightness(
