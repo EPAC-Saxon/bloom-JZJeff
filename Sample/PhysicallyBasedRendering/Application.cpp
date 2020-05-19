@@ -162,11 +162,12 @@ std::vector<std::string> Application::CreateTextures(
 std::shared_ptr<sgl::Texture> Application::AddBloom(
 	const std::shared_ptr<sgl::Texture>& texture) const
 {
-	return texture;
-	//auto brightness = CreateBrightness(texture);
-	//auto gaussian_blur = CreateGaussianBlur(brightness);
-	//auto merge = MergeDisplayAndGaussianBlur(texture, gaussian_blur);
-	//return merge;
+
+	auto brightness = CreateBrightness(texture);
+	return brightness;
+	auto gaussian_blur = CreateGaussianBlur(brightness);
+	auto merge = MergeDisplayAndGaussianBlur(texture, gaussian_blur);
+	return merge;
 }
 
 std::shared_ptr<sgl::Texture> Application::CreateBrightness(
@@ -181,11 +182,15 @@ std::shared_ptr<sgl::Texture> Application::CreateBrightness(
 	sgl::Frame frame = sgl::Frame();
 	sgl::Render render = sgl::Render();
 
+	frame.BindAttach(render);
+	render.BindStorage(texture->GetSize());
+	
+
 	//Create new Texture
 	auto tmp_texture = std::make_shared<sgl::Texture>(size);
-
+	
 	//Bind
-	tmp_texture->Bind();
+	frame.BindTexture(*tmp_texture);
 
 	//A texture manager.
 	sgl::TextureManager texture_Manager = sgl::TextureManager();
@@ -202,6 +207,13 @@ std::shared_ptr<sgl::Texture> Application::CreateBrightness(
 	//Add the texture to the quad.
 	quad->SetTextures({ "Display" });
 	
+	// Set the view port for rendering.
+	glViewport(0, 0, texture->GetSize().first, texture->GetSize().second);
+
+	// Clear the screen.
+	glClearColor(.2f, 0.f, .2f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	//Draw
 	quad->Draw(texture_Manager);
 	

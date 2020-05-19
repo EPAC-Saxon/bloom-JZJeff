@@ -72,11 +72,11 @@ namespace sgl {
 
 	std::shared_ptr<Texture> Device::DrawTexture(const double dt)
 	{
-		//// Setup the camera.
+		// Setup the camera.
 		SetupCamera();
 
 		//need texture
-		auto tmp_texture = std::make_shared<Texture>(size_);
+		auto tmp_texture = std::make_shared<Texture>(size_, PixelElementSize::FLOAT);
 
 		Frame frame = Frame();
 		Render render = Render();
@@ -89,7 +89,7 @@ namespace sgl {
 		glViewport(0, 0, size_.first, size_.second);
 
 		//// Clear the screen.
-		//glClearColor(.2f, 0.f, .2f, 1.0f);
+		glClearColor(.2f, 0.f, .2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//bind texture
