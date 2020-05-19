@@ -54,8 +54,9 @@ namespace sgl {
 		//Need QadMesh
 		auto quad = CreateQuadMesh(program);
 
+		TextureManager texture_manager;
 		//Add Texture calling DISPLAY
-		texture_manager_.AddTexture("Display", texture);
+		texture_manager.AddTexture("Display", texture);
 
 		//Set Texture to Quad
 		quad->SetTextures({ "Display" });
@@ -65,16 +66,14 @@ namespace sgl {
 		
 
 		//Draw Quad
-		quad->Draw(texture_manager_, perspective_, view_, model_);
+		quad->Draw(texture_manager);
 
 	}
 
 	std::shared_ptr<Texture> Device::DrawTexture(const double dt)
 	{
 		//// Setup the camera.
-		//SetupCamera();
-
-
+		SetupCamera();
 
 		//need texture
 		auto tmp_texture = std::make_shared<Texture>(size_);
@@ -86,15 +85,15 @@ namespace sgl {
 		frame.BindAttach(render);
 		render.BindStorage(size_);
 
-		//bind texture
-		frame.BindTexture(*tmp_texture);
-
 		//// Set the view port for rendering.
 		glViewport(0, 0, size_.first, size_.second);
 
 		//// Clear the screen.
 		//glClearColor(.2f, 0.f, .2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//bind texture
+		frame.BindTexture(*tmp_texture);
 
 		for (const std::shared_ptr<sgl::Scene>& scene : scene_tree_)
 		{
