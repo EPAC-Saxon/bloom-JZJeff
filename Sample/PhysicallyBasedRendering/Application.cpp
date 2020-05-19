@@ -164,8 +164,8 @@ std::shared_ptr<sgl::Texture> Application::AddBloom(
 {
 
 	auto brightness = CreateBrightness(texture);
-	return brightness;
 	auto gaussian_blur = CreateGaussianBlur(brightness);
+	return gaussian_blur;
 	auto merge = MergeDisplayAndGaussianBlur(texture, gaussian_blur);
 	return merge;
 }
@@ -173,18 +173,12 @@ std::shared_ptr<sgl::Texture> Application::AddBloom(
 std::shared_ptr<sgl::Texture> Application::CreateBrightness(
 	const std::shared_ptr<sgl::Texture>& texture) const
 {
-#pragma message ("You have to complete this code!")
-
 	//size from texure
 	auto size = texture->GetSize();
 
 	//initialize frame-Render
 	sgl::Frame frame = sgl::Frame();
 	sgl::Render render = sgl::Render();
-
-	frame.BindAttach(render);
-	render.BindStorage(texture->GetSize());
-	
 
 	//Create new Texture
 	auto tmp_texture = std::make_shared<sgl::Texture>(size);
@@ -224,7 +218,70 @@ std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
 	const std::shared_ptr<sgl::Texture>& texture) const
 {
 #pragma message ("You have to complete this code!")
-	return texture;
+	//size from texure
+	auto size = texture->GetSize();
+
+	//initialize frame-Render
+	sgl::Render render = sgl::Render();
+
+	//Create array of frame and textue.
+	sgl::Frame frames[2];
+	frames[0].BindAttach(render);
+	frames[1].BindAttach(render);
+	std::shared_ptr<sgl::Texture> textures[] = {texture, std::make_shared<sgl::Texture>(texture->GetSize(), sgl::PixelElementSize::FLOAT) };
+
+	render.BindStorage(texture->GetSize());
+	//Bind Texture
+	frames[0].BindTexture(*textures[0]);
+	frames[1].BindTexture(*textures[1]);
+	
+	//Create the program
+	auto program = sgl::CreateProgram("GaussianBlur");
+
+	//Create the quad.
+	auto quad = CreateQuadMesh(program);
+
+	//create bool for vertical-Horizontal
+	bool beginning = true;
+	bool horizontal = true;
+
+	// Set the view port for rendering.
+	glViewport(0, 0, texture->GetSize().first, texture->GetSize().second);
+	
+	//Loop on 10 ierations
+	for (int i = 0; i < 10; ++i) {
+		// Clear the screen.
+		glClearColor(.2f, 0.f, .2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//the horizontal boolean as an int to the program!
+		program->UniformInt("horizontal", horizontal);
+		// need a texture manager
+		sgl::TextureManager texture_manager;
+
+		if (beginning)
+		{
+			texture_manager.AddTexture("texture", textures[0]);
+		}
+		else
+		{
+			texture_manager.AddTexture("texture", textures[1]);
+		}
+		//Set textures
+		quad->SetTextures({ "texture" });
+		//Draw quad
+		quad->Draw(texture_manager);
+
+		//Switch horizontal bool
+		if (horizontal)
+		{
+			beginning = !beginning;
+		}
+		horizontal = !horizontal;
+
+		return textures[1];
+	}
+
 }
 
 std::shared_ptr<sgl::Texture> Application::MergeDisplayAndGaussianBlur(
